@@ -48,7 +48,7 @@ INSTALLATION
         % /path/to/ngx_trace/tracerx.pl ./objs/nginx -p mynginx
 
 SYNOPSIS
-    tracengx.pl [OPTIONS] COMMAND
+    tracex.pl [OPTIONS] COMMAND
 
 OPTIONS
     -l      print filename and line number saved from "nm -l"

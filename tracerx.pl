@@ -155,7 +155,7 @@ And now you can start playing with F<tracerx.pl>:
 
 =head1 SYNOPSIS
 
-tracengx.pl [OPTIONS] COMMAND
+tracex.pl [OPTIONS] COMMAND
 
 =head1 OPTIONS
 
