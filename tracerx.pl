@@ -103,7 +103,7 @@ __END__
 
 =head1 NAME
 
-tracengx.pl - runtime call tracer for nginx
+tracerx.pl - runtime call tracer for nginx
 
 =head1 DESCRIPTION
 
