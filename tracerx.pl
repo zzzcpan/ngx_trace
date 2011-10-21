@@ -145,7 +145,7 @@ and uses ports that doesn't require privileges to bind to:
             listen 5678;
     ...
 
-If find it useful to print errors to stderr as well:
+I find it useful to print errors to stderr as well:
 
     error_log /dev/stderr;
 
@@ -185,7 +185,7 @@ Show all calls within F<src/http> and F<src/event> modules:
 
     % ./tracerx.pl -f 'src/http|src/event' ./objs/nginx -p mynginx
 
-Show calls withing http and ignore all calls containing _log_ in function
+Show calls within http and ignore all calls containing _log_ in function
 name:
 
     % ./tracerx.pl -f 'src/http' -i '_log_' ./objs/nginx -p mynginx
