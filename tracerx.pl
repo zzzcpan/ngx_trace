@@ -133,7 +133,7 @@ Prepare environment to run nginx from:
     % cp -r html mynginx/
 
 Edit your new C<nginx.conf>, make sure it runs single process in foreground 
-and uses ports that doesn't require privileges to bind to:
+and uses ports that don't require privileges to bind to:
 
     daemon off;
     master_process off;

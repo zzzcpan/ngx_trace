@@ -27,7 +27,7 @@ INSTALLATION
         % cp -r html mynginx/
 
     Edit your new "nginx.conf", make sure it runs single process in
-    foreground and uses ports that doesn't require privileges to bind to:
+    foreground and uses ports that don't require privileges to bind to:
 
         daemon off;
         master_process off;
