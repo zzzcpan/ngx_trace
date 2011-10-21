@@ -1,0 +1,83 @@
+NAME
+    tracengx.pl - runtime call tracer for nginx
+
+DESCRIPTION
+    Simple runtime call tracer. Uses profiling instrument functions and
+    symbol table to record and print calls. Useful for complex problems and
+    learning nginx internals.
+
+    Something similar can be done with gdb and lots of breakpoints, but
+    annoyingly slowly.
+
+INSTALLATION
+    Download and compile nginx with "ngx_trace" module:
+
+        % ./configure --add-module=/path/to/ngx_trace  && make
+
+    This will enable debug symbols and instrument functions for gcc. Next,
+    make sure binary works and can print its own version:
+
+        % ./objs/nginx -V
+
+    Prepare environment to run nginx from:
+
+        % mkdir mynginx
+        % mkdir mynginx/logs
+        % cp -r conf mynginx/
+        % cp -r html mynginx/
+
+    Edit your new "nginx.conf", make sure it runs single process in
+    foreground and uses ports that doesn't require privileges to bind to:
+
+        daemon off;
+        master_process off;
+    
+        ...
+    
+        http {
+            server {
+                listen 5678;
+        ...
+
+    If find it useful to print errors to stderr as well:
+
+        error_log /dev/stderr;
+
+    And now you can start playing with tracerx.pl:
+
+        % /path/to/ngx_trace/tracerx.pl ./objs/nginx -p mynginx
+
+SYNOPSIS
+    tracengx.pl [OPTIONS] COMMAND
+
+OPTIONS
+    -l      print filename and line number saved from "nm -l"
+
+    -s PATTERN
+            print calls matching specified regex pattern only
+
+    -i PATTERN
+            ignore calls matching regex pattern
+
+    -f PATTERN
+            print calls if filename matches pattern
+
+EXAMPLES
+    Show all calls within src/http and src/event modules:
+
+        % ./tracerx.pl -f 'src/http|src/event' ./objs/nginx -p mynginx
+
+    Show calls withing http and ignore all calls containing _log_ in
+    function name:
+
+        % ./tracerx.pl -f 'src/http' -i '_log_' ./objs/nginx -p mynginx
+
+AUTHOR
+    Alexandr Gomoliako <zzz@zzz.org.ua>
+
+LICENSE
+    Copyright 2011 Alexandr Gomoliako. All rights reserved.
+
+    This module is free software. It may be used, redistributed and/or
+    modified under the same terms as Perl itself.
+

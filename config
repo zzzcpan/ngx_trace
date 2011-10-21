@@ -1,0 +1,6 @@
+
+ngx_addon_name="ngx_trace"
+NGX_ADDON_SRCS="$NGX_ADDON_SRCS $ngx_addon_dir/ngx_trace.c"
+
+CFLAGS="$CFLAGS -g -finstrument-functions"
+
