@@ -1,5 +1,5 @@
 NAME
-    tracengx.pl - runtime call tracer for nginx
+    tracerx.pl - runtime call tracer for nginx
 
 DESCRIPTION
     Simple runtime call tracer. Uses profiling instrument functions and
