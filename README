@@ -41,14 +41,21 @@ INSTALLATION
 
     I find it useful to print errors to stderr as well:
 
-        error_log /dev/stderr;
+        error_log /dev/stderr debug;
 
     And now you can start playing with tracerx.pl:
 
         % /path/to/ngx_trace/tracerx.pl ./objs/nginx -p mynginx
 
+    More useful: prints filename, line number, calls within http, event
+    modules, ngx_connection.c and ignores access.log messages:
+
+        % ./tracerx.pl -l -f 'core/ngx_conn|http/|event/' \
+                       -i 'get_indexed_variable|_log_' \
+                       ./objs/nginx -p mynginx
+
 SYNOPSIS
-    tracex.pl [OPTIONS] COMMAND
+    tracerx.pl [OPTIONS] COMMAND [ARGS]
 
 OPTIONS
     -l      print filename and line number saved from "nm -l"
