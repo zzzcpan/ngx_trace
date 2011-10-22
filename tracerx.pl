@@ -147,15 +147,23 @@ and uses ports that don't require privileges to bind to:
 
 I find it useful to print errors to stderr as well:
 
-    error_log /dev/stderr;
+    error_log /dev/stderr debug;
 
 And now you can start playing with F<tracerx.pl>:
 
     % /path/to/ngx_trace/tracerx.pl ./objs/nginx -p mynginx
 
+More useful: prints filename, line number, calls within http, event 
+modules, ngx_connection.c and ignores access.log messages: 
+
+    % ./tracerx.pl -l -f 'core/ngx_conn|http/|event/' \
+                   -i 'get_indexed_variable|_log_' \
+                   ./objs/nginx -p mynginx
+
+
 =head1 SYNOPSIS
 
-tracex.pl [OPTIONS] COMMAND
+tracerx.pl [OPTIONS] COMMAND [ARGS]
 
 =head1 OPTIONS
 
