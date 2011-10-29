@@ -12,7 +12,7 @@ our $VERSION = '0.02';
 $| = 1;
 
 my $ignore_unknown = 1;
-my ($show_line, $file_filter, $func_filter, $func_ignore);
+my ($show_line, $show_time, $file_filter, $func_filter, $func_ignore);
 
 while ($ARGV[0] =~ /^-/) {
     local $_ = shift;
@@ -23,6 +23,8 @@ while ($ARGV[0] =~ /^-/) {
         $show_line = 1;
     } elsif (/^-u/) {
         $ignore_unknown = 0;
+    } elsif (/^-t/) {
+        $show_time = 1;
     } elsif (/^-f/) {
         $file_filter = shift;
     } elsif (/^-s/) {
@@ -69,7 +71,8 @@ print "Starting $cmd\n";
 
 open(OBJ, $cmd) or die "Cannot start $cmd: $!\n";
 
-my ($indent, $prevtime, $curtime);
+my ($indent, $ignored, $prevtime, $curtime, @timestack,
+    @callcounter);
 
 while (<OBJ>) {
     my ($action, $addr, $sec, $usec) = 
@@ -91,19 +94,33 @@ while (<OBJ>) {
     if ($action eq 'enter') {
         $indent .= '   '; 
 
-        my $buf = $indent . ( $SYM{ hex($addr) }->{name} || "0x$addr" );
+        push @timestack, $sec + $usec/1000000;
+
+        my $buf = $indent . (  $SYM{ hex($addr) }->{name} || "0x$addr"  );
 
         if ($show_line) { 
             $buf  = sprintf("+%010.6fs ", $curtime - $prevtime) . $buf;
 
             $buf .= " " x (79 - length($buf))  if length($buf) < 79; 
             $buf .= " " . ( $SYM{ hex($addr) }->{file} || 
-                            $FUNC{ $SYM{ hex($addr) }->{name} } );
+                            $FUNC{  $SYM{ hex($addr) }->{name}  } );
         }
 
         print "$buf\n";
 
     } elsif ($action eq 'exit') {
+        my $entertime = pop @timestack;
+
+        if ($show_time && $show_line) { 
+            printf("+%010.6fs $indent--- %i\n", 
+                   $curtime - $prevtime, ($curtime - $entertime) * 1000000,
+                   $SYM{ hex($addr) }->{name} || "0x$addr");
+        } elsif ($show_time) { 
+            printf("$indent--- %i\n", 
+                   ($curtime - $entertime) * 1000000,
+                   $SYM{ hex($addr) }->{name} || "0x$addr");
+        }
+
         substr($indent, -3, 3, '');
     }
 }
@@ -196,6 +213,10 @@ ignore calls matching regex pattern
 =item B<-f PATTERN>
 
 print calls if filename matches pattern
+
+=item B<-t>
+
+show how much time it took to run each function in microseconds
 
 =item B<-u>
 
