@@ -7,7 +7,7 @@ no  warnings 'uninitialized';
 use Pod::Usage;
 
 our $Script  = 'tracerx.pl';
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 $| = 1;
 
@@ -69,14 +69,24 @@ print "Starting $cmd\n";
 
 open(OBJ, $cmd) or die "Cannot start $cmd: $!\n";
 
-my $indent;
+my ($indent, $prevtime, $curtime);
 
 while (<OBJ>) {
-    my ($action, $addr) = 
-        m/ ^ (?: nginx: )? \s+ (enter|exit) \s+ (?:0x)? ( [0-9a-fA-F]+ ) /x
-            or print && next;
+    my ($action, $addr, $sec, $usec) = 
+        m/ ^ (?: nginx: )? 
+                \s+ 
+             ( enter | exit ) 
+                \s+ 
+             (?: 0x )? ( [0-9a-fA-F]+ ) 
+                \s+
+             ( [0-9]+ ) 
+                \s+
+             ( [0-9]+ )  /x  or print && next;
 
     next  unless $SYM{ hex($addr) }->{name}; # ignoring unknown functions
+
+    $prevtime = $curtime;
+    $curtime  = $sec + $usec/1000000;
 
     if ($action eq 'enter') {
         $indent .= '   '; 
@@ -84,9 +94,11 @@ while (<OBJ>) {
         my $buf = $indent. $SYM{ hex($addr) }->{name};
 
         if ($show_line) { 
-            $buf .= " " x (79 - length($buf))  if length($buf) < 79;
-            $buf .= " ". $SYM{ hex($addr) }->{file} || 
-                            $FUNC{ $SYM{ hex($addr) }->{name} };
+            $buf  = sprintf("+%010.6fs ", $curtime - $prevtime) . $buf;
+
+            $buf .= " " x (79 - length($buf))  if length($buf) < 79; 
+            $buf .= " " . ( $SYM{ hex($addr) }->{file} || 
+                            $FUNC{ $SYM{ hex($addr) }->{name} } );
         }
 
         print "$buf\n";
@@ -171,7 +183,7 @@ tracerx.pl [OPTIONS] COMMAND [ARGS]
 
 =item B<-l>
 
-print filename and line number saved from C<nm -l>
+print filename, line number saved from C<nm -l> and time offset 
 
 =item B<-s PATTERN>
 

@@ -58,7 +58,7 @@ SYNOPSIS
     tracerx.pl [OPTIONS] COMMAND [ARGS]
 
 OPTIONS
-    -l      print filename and line number saved from "nm -l"
+    -l      print filename, line number saved from "nm -l" and time offset
 
     -s PATTERN
             print calls matching specified regex pattern only

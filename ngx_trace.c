@@ -33,7 +33,8 @@ ngx_module_t  ngx_http_ptrace = {
 };
 
 
-int notrace;
+static int             notrace;
+static struct timeval  curtv;
 
 void __cyg_profile_func_enter(void *this_fn, void *call_site)
 	__attribute__ ((no_instrument_function));
@@ -80,7 +81,8 @@ __cyg_profile_func_enter(void *this_fn, void *call_site)
     if (notrace) return;
     
     notrace = 1;
-    ngx_trace("enter %p", this_fn);
+    ngx_gettimeofday(&curtv);
+    ngx_trace("enter %p %i %i", this_fn, curtv.tv_sec, curtv.tv_usec);
     notrace = 0;
 
     (void)call_site;
@@ -92,7 +94,8 @@ __cyg_profile_func_exit(void *this_fn, void *call_site)
     if (notrace) return;
 
     notrace = 1;
-    ngx_trace("exit %p", this_fn);
+    ngx_gettimeofday(&curtv);
+    ngx_trace("exit %p %i %i", this_fn, curtv.tv_sec, curtv.tv_usec);
     notrace = 0;
 
     (void)call_site;
