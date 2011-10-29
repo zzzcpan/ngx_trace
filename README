@@ -69,6 +69,8 @@ OPTIONS
     -f PATTERN
             print calls if filename matches pattern
 
+    -u      show addresses of unknown functions
+
 EXAMPLES
     Show all calls within src/http and src/event modules:
 

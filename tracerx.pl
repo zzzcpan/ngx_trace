@@ -11,10 +11,8 @@ our $VERSION = '0.02';
 
 $| = 1;
 
-my $show_line   = 0;
-my $file_filter = '';
-my $func_filter = '';
-my $func_ignore = '';
+my $ignore_unknown = 1;
+my ($show_line, $file_filter, $func_filter, $func_ignore);
 
 while ($ARGV[0] =~ /^-/) {
     local $_ = shift;
@@ -23,6 +21,8 @@ while ($ARGV[0] =~ /^-/) {
         pod2usage(0);
     } elsif (/^-l/) {
         $show_line = 1;
+    } elsif (/^-u/) {
+        $ignore_unknown = 0;
     } elsif (/^-f/) {
         $file_filter = shift;
     } elsif (/^-s/) {
@@ -83,7 +83,7 @@ while (<OBJ>) {
                 \s+
              ( [0-9]+ )  /x  or print && next;
 
-    next  unless $SYM{ hex($addr) }->{name}; # ignoring unknown functions
+    next  if $ignore_unknown && !$SYM{ hex($addr) }->{name};
 
     $prevtime = $curtime;
     $curtime  = $sec + $usec/1000000;
@@ -91,7 +91,7 @@ while (<OBJ>) {
     if ($action eq 'enter') {
         $indent .= '   '; 
 
-        my $buf = $indent. $SYM{ hex($addr) }->{name};
+        my $buf = $indent . ( $SYM{ hex($addr) }->{name} || "0x$addr" );
 
         if ($show_line) { 
             $buf  = sprintf("+%010.6fs ", $curtime - $prevtime) . $buf;
@@ -196,6 +196,10 @@ ignore calls matching regex pattern
 =item B<-f PATTERN>
 
 print calls if filename matches pattern
+
+=item B<-u>
+
+show addresses of unknown functions
 
 =back
 
