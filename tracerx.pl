@@ -5,6 +5,8 @@ use warnings;
 no  warnings 'uninitialized';
 
 use Pod::Usage;
+use Term::ANSIColor qw(:constants);
+$Term::ANSIColor::AUTORESET = 1;
 
 our $Script  = 'tracerx.pl';
 our $VERSION = '0.02';
@@ -12,7 +14,7 @@ our $VERSION = '0.02';
 $| = 1;
 
 my $ignore_unknown = 1;
-my ($show_line, $show_time, $file_filter, $func_filter, $func_ignore);
+my ($show_line, $show_time, $file_filter, $func_filter, $func_color, $func_ignore);
 
 while ($ARGV[0] =~ /^-/) {
     local $_ = shift;
@@ -29,6 +31,8 @@ while ($ARGV[0] =~ /^-/) {
         $file_filter = shift;
     } elsif (/^-s/) {
         $func_filter = shift;
+    } elsif (/^-c/) {
+        $func_color = shift;
     } elsif (/^-i/) {
         $func_ignore = shift;
     } else {
@@ -56,6 +60,8 @@ while (<NM>) {
     next  if $file_filter && $file !~ /$file_filter/;
     next  if $func_filter && $name !~ /$func_filter/;
     next  if $func_ignore && $name =~ /$func_ignore/;
+
+    $name = YELLOW"$name" if $func_color && $name =~ /$func_color/;
 
     $SYM{hex($addr)} = { name => $name, file => $file };
 
@@ -205,6 +211,10 @@ print filename, line number saved from C<nm -l> and time offset
 =item B<-s PATTERN>
 
 print calls matching specified regex pattern only
+
+=item B<-c PATTERN>
+
+print calls matching specified regex pattern in yellow color
 
 =item B<-i PATTERN>
 
