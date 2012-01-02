@@ -63,6 +63,9 @@ OPTIONS
     -s PATTERN
             print calls matching specified regex pattern only
 
+    -c PATTERN
+            print calls matching specified regex pattern in yellow color
+
     -i PATTERN
             ignore calls matching regex pattern
 
