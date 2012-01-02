@@ -14,7 +14,8 @@ our $VERSION = '0.02';
 $| = 1;
 
 my $ignore_unknown = 1;
-my ($show_line, $show_time, $file_filter, $func_filter, $func_color, $func_ignore);
+my ($show_line, $show_time, $file_filter, $func_filter, $func_color, 
+    $func_ignore);
 
 while ($ARGV[0] =~ /^-/) {
     local $_ = shift;
