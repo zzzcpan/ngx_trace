@@ -5,8 +5,7 @@ use warnings;
 no  warnings 'uninitialized';
 
 use Pod::Usage;
-use Term::ANSIColor qw(:constants);
-$Term::ANSIColor::AUTORESET = 1;
+use Term::ANSIColor qw(color);
 
 our $Script  = 'tracerx.pl';
 our $VERSION = '0.02';
@@ -62,9 +61,10 @@ while (<NM>) {
     next  if $func_filter && $name !~ /$func_filter/;
     next  if $func_ignore && $name =~ /$func_ignore/;
 
-    $name = YELLOW"$name" if $func_color && $name =~ /$func_color/;
-
-    $SYM{hex($addr)} = { name => $name, file => $file };
+    $SYM{hex($addr)} = {  name      => $name, 
+                          file      => $file,
+                          highlight => scalar ( $func_color && 
+                                                $name =~ /$func_color/ )  };
 
     $FUNC{$name} = $file  if $name && $file;
 }
@@ -103,12 +103,20 @@ while (<OBJ>) {
 
         push @timestack, $sec + $usec/1000000;
 
-        my $buf = $indent . (  $SYM{ hex($addr) }->{name} || "0x$addr"  );
+        my $func = $SYM{ hex($addr) }->{name} || "0x$addr";
+        my $hl   = $SYM{ hex($addr) }->{highlight};
+
+        if ($hl) {
+            $hl   = length( color('yellow') . color('reset') );
+            $func = color('yellow') . $func . color('reset');
+        }
+
+        my $buf = $indent . $func;
 
         if ($show_line) { 
             $buf  = sprintf("+%010.6fs ", $curtime - $prevtime) . $buf;
 
-            $buf .= " " x (79 - length($buf))  if length($buf) < 79; 
+            $buf .= " " x (79 - length($buf) + $hl)  if length($buf) < 79; 
             $buf .= " " . ( $SYM{ hex($addr) }->{file} || 
                             $FUNC{  $SYM{ hex($addr) }->{name}  } );
         }
