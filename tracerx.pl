@@ -116,7 +116,9 @@ while (<OBJ>) {
         if ($show_line) { 
             $buf  = sprintf("+%010.6fs ", $curtime - $prevtime) . $buf;
 
-            $buf .= " " x (79 - length($buf) + $hl)  if length($buf) < 79; 
+            $buf .= " " x (79 - length($buf) + $hl)  
+                     if  length($buf) - $hl < 79; 
+
             $buf .= " " . ( $SYM{ hex($addr) }->{file} || 
                             $FUNC{  $SYM{ hex($addr) }->{name}  } );
         }
